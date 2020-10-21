@@ -1,2 +1,3 @@
 # FiMDP-Evaluation
-Evaluation of FiMDP and its features
+
+Repository for notebook with tests for evaluating FiMDP and comparing with other tools like Storm. 
