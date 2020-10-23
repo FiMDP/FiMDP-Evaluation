@@ -1,52 +1,46 @@
-from fimdpenv.UUVEnv import SingleAgentEnv
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
+from fimdpenv.UUVEnv import SingleAgentEnv
 from fimdp.core import CounterStrategy
 from fimdp.energy_solvers import GoalLeaningES, BasicES
 from fimdp.objectives import AS_REACH, BUCHI, MIN_INIT_CONS, POS_REACH, SAFE
-import seaborn as sns
-import pandas as pd
 import matplotlib.animation as animation
 
 
-# Create environment configurations
+# Create test environment configurations
 def create_env(env_name, capacity=200, heading_sd=0.524, reloads_input=None):
     """
     Create different environments with different grid sizes, target states, and reload
     states
     """
-
     if env_name == '2R-1T-simple':
         grid_size = (20,20)
         capacity = capacity 
         init_state = 5*grid_size[0]+2
         reloads = [2*grid_size[0]+5, 12*grid_size[0] - 5]
         targets = [grid_size[0]*grid_size[1] - 3*grid_size[0] - 8]
- 
     elif env_name == '2R-1T-complex':
         grid_size = (20,20)
         capacity = capacity 
         init_state = 5*grid_size[0]+2
         reloads = [8*grid_size[0]+3, 12*grid_size[0] - 5]
         targets = [grid_size[0]*grid_size[1] - 3*grid_size[0] - 8]
-
     elif env_name == '4R-5T-complex':
         grid_size = (30,80)
         capacity = capacity 
         init_state = 15*grid_size[1]+ 10
         reloads = [5*grid_size[1]+20, 5*grid_size[1]+60, 23*grid_size[1]+10, 23*grid_size[1]+70]
         targets = [5*grid_size[1]+10, 5*grid_size[1]+40, 5*grid_size[1]+70, 27*grid_size[1]+20, 27*grid_size[1]+60]   
-        
     elif env_name == '4R-1T-complex':
         grid_size = (30,80)
         capacity = capacity 
         init_state = 5*grid_size[1]+ 10
         reloads = [5*grid_size[1]+30,5*grid_size[1]+50,17*grid_size[1]+45,20*grid_size[1]+65]
         targets = [27*grid_size[1]+60]   
-        
     else:
         raise Exception("No configuration with that name. Please check the entered name again")
-
     if reloads_input is None:
         env = SingleAgentEnv(grid_size, capacity, reloads, targets, init_state, heading_sd=heading_sd)
     else:
@@ -57,7 +51,7 @@ def create_env(env_name, capacity=200, heading_sd=0.524, reloads_input=None):
 def create_counterstrategy(consmdp, capacity, targets, init_state, energy=None, solver=GoalLeaningES, objective=BUCHI, threshold=0.1):
     """
     Create counter strategy for given parameters and the current consMDP object
-    and returns the strategy
+    and return the strategy
     """
     
     if energy is None:
@@ -73,7 +67,7 @@ def create_counterstrategy(consmdp, capacity, targets, init_state, energy=None, 
 
 def animate_simulation(env, num_steps=100, interval=100):
     """
-    Execute the strategy for num_steps number of time steps and animates the
+    Execute the strategy for num_steps number of time steps and animate the
     resultant trajectory.
     """
     
@@ -133,9 +127,9 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
     number of snaphot indices given must be an even number
     """
     
-    length_snapshotsindices = [len(x) for x in snapshots_indices]
+    len_snapshotsindices = [len(x) for x in snapshots_indices]
     num_datasets = len(snapshots_indices)
-    num_snapshots = sum(length_snapshotsindices)
+    num_snapshots = sum(len_snapshotsindices)
     fig, axes = plt.subplots(nrows=num_datasets, ncols=num_snapshots//num_datasets)
 
     dataset = 0
@@ -145,10 +139,10 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
         img_data = im_history[dataset][index]
         ax.imshow(img_data)
         if annotate is True:    
-            name = '('+str(dataset+1)+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index], fontsize=3)
+            name = '('+str(dataset+1)+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index])
             ax.set_xlabel(name)
         else:
-            ax.set_xlabel('t = {} e = {}'.format(index, energy_history[dataset][index]), fontsize=5)
+            ax.set_xlabel('t = {} e = {}'.format(index, energy_history[dataset][index]))
         count += 1
         if count == len(snapshots_indices[dataset]):
             dataset += 1
@@ -169,9 +163,7 @@ def plot_exptimetotarget(env, threshold_list, num_runs=1000, filename='exptime_d
     
     exptime_diffthreshold = {}
     for threshold in threshold_list:
-        
         env.create_counterstrategy(threshold=threshold)
-        
         time_hist = []
         for run in range(num_runs):
             env.reset()
@@ -180,8 +172,6 @@ def plot_exptimetotarget(env, threshold_list, num_runs=1000, filename='exptime_d
                 if env.positions[0] in env.targets:
                     time_hist.append(env.num_timesteps)
                     break
-        
-
         exptime_diffthreshold[threshold] = np.mean(time_hist)
         df = pd.DataFrame({'threshold':list(exptime_diffthreshold.keys()), 'times':list(exptime_diffthreshold.values())})
         df.to_csv(filename)
@@ -193,9 +183,13 @@ def plot_exptimetotarget(env, threshold_list, num_runs=1000, filename='exptime_d
 def calc_exptimetotarget(env, num_runs=1000):
     """
     Caclulate the expected time to reach the target for a in a given 
-    test environment
+    test environment using the strategy stored in the strategy object of the 
+    environment.
     """
-        
+    
+    if env.strategies is None:
+        raise Exception('add a strategy to the environment using the update_strategy() method.')
+    
     time_hist = []
     for run in range(num_runs):
         env.reset()
