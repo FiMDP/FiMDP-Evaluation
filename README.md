@@ -19,7 +19,7 @@ The *Goal-leaning solvers* subsection of the *Evaluation* section in the TACAS s
 Both of the notebooks use environments from [FiMDPEnv].
 
 ## Requirements
-In order to run these notebooks, you need the following Python libraries: 
+In order to run these notebooks, you need the following Python libraries (in addition to FiMDP and FiMDPEnv): 
 ```
 pandas matplotlib numpy seaborn
 ```
