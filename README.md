@@ -2,7 +2,7 @@
 
 This repository hosts notebooks that evaluate [FiMDP]. 
 
-### FiMDP vs Stormm Comparison
+### FiMDP vs Storm Comparison
 The notebook [fimdp_and_storm_comparison.ipynb](fimdp_and_storm_comparison.ipynb) 
 compares the performance of FiMDP with the popular open-source model checker 
 [Storm]. [FiMDP] performs the analysis directly on a given consumption MDP, while 
