@@ -25,8 +25,8 @@ def create_env(env_name, capacity=200, heading_sd=0.624, reloads_input=None):
         grid_size = (20,20)
         capacity = capacity 
         init_state = 5*grid_size[0]+2
-        reloads = [6*grid_size[0]+2-12]
-        targets = [grid_size[0]*grid_size[1] - 2*grid_size[0] - 8]
+        reloads = [4*grid_size[0]+2-12]
+        targets = [grid_size[0]*grid_size[1] - 7*grid_size[0] - 8]
     elif env_name == '2R-1T-complex':
         grid_size = (20,20)
         capacity = capacity 
@@ -127,7 +127,7 @@ def visualize_snapshots(im_history, energy_history, snapshots_indices=[], annota
         fig.savefig(filename+'.png', dpi=400)
         
         
-def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], annotate=True, filename=None):
+def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], annotate=True, annotate_names=None, filename=None):
     """
     Create static subplots showing different instances of a simulation. The 
     number of snaphot indices given must be an even number
@@ -145,8 +145,11 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
         img_data = im_history[dataset][index]
         ax.imshow(img_data)
         if annotate is True:    
-            name = '('+str(dataset+1)+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index])
-            ax.set_xlabel(name)
+            if annotate_names is not None:
+                name = '('+annotate_names[dataset]+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index])
+            else:
+                name = '('+str(dataset+1)+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index])
+            ax.set_xlabel(name, fontsize=8)
         else:
             ax.set_xlabel('t = {} e = {}'.format(index, energy_history[dataset][index]))
         count += 1
@@ -158,7 +161,7 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
     fig.tight_layout()
     plt.show()
     if filename is not None:
-        fig.savefig(filename+'.png', dpi=400)
+        fig.savefig(filename+'.pdf', dpi=400)
         
     
 def plot_exptimetotarget(env, threshold_list, num_runs=1000, filename='exptime_diffthresholds.csv'):
