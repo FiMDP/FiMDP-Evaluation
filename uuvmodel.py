@@ -10,7 +10,7 @@ import matplotlib.animation as animation
 
 
 # Create test environment configurations
-def create_env(env_name, capacity=200, heading_sd=0.624, reloads_input=None):
+def create_env(env_name, capacity=200, heading_sd=1.624, reloads_input=None):
     """
     Create different environments with different grid sizes, target states, and reload
     states
@@ -19,13 +19,13 @@ def create_env(env_name, capacity=200, heading_sd=0.624, reloads_input=None):
         grid_size = (20,20)
         capacity = capacity 
         init_state = 4*grid_size[0]+2
-        reloads = [2*grid_size[0]+5, 12*grid_size[0] - 5]
+        reloads = [5*grid_size[0]+5, 12*grid_size[0] - 5]
         targets = [grid_size[0]*grid_size[1] - 3*grid_size[0] - 8]
     elif env_name == '1R-1T-simple':
         grid_size = (20,20)
         capacity = capacity 
         init_state = 5*grid_size[0]+2
-        reloads = [4*grid_size[0]+2-12]
+        reloads = [6*grid_size[0]+2-12]
         targets = [grid_size[0]*grid_size[1] - 7*grid_size[0] - 8]
     elif env_name == '2R-1T-complex':
         grid_size = (20,20)
@@ -48,7 +48,7 @@ def create_env(env_name, capacity=200, heading_sd=0.624, reloads_input=None):
     else:
         raise Exception("No configuration with that name. Please check the entered name again")
     if reloads_input is None:
-        env = SingleAgentEnv(grid_size, capacity, reloads, targets, init_state, heading_sd=heading_sd)
+        env = SingleAgentEnv(grid_size, capacity, reloads, targets, init_state, heading_sd=heading_sd, enhanced_actionspace=1)
     else:
         env = SingleAgentEnv(grid_size, capacity, reloads_input, targets, init_state, heading_sd=heading_sd)
     return env
