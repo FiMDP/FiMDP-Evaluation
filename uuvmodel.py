@@ -10,7 +10,7 @@ import matplotlib.animation as animation
 
 
 # Create test environment configurations
-def create_env(env_name, capacity=200, heading_sd=1.624, reloads_input=None):
+def create_env(env_name, capacity=200, heading_sd=0.6, reloads_input=None):
     """
     Create different environments with different grid sizes, target states, and reload
     states
@@ -24,7 +24,7 @@ def create_env(env_name, capacity=200, heading_sd=1.624, reloads_input=None):
     elif env_name == '1R-1T-simple':
         grid_size = (20,20)
         capacity = capacity 
-        init_state = 5*grid_size[0]+2
+        init_state = 4*grid_size[0]+2
         reloads = [6*grid_size[0]+2-12]
         targets = [grid_size[0]*grid_size[1] - 7*grid_size[0] - 8]
     elif env_name == '2R-1T-complex':
@@ -137,6 +137,7 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
     num_datasets = len(snapshots_indices)
     num_snapshots = sum(len_snapshotsindices)
     fig, axes = plt.subplots(nrows=num_datasets, ncols=num_snapshots//num_datasets)
+    fig.subplots_adjust(hspace=0.1, wspace=0.1)
 
     dataset = 0
     count = 0
@@ -146,7 +147,7 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
         ax.imshow(img_data)
         if annotate is True:    
             if annotate_names is not None:
-                name = '('+annotate_names[dataset]+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index])
+                name = 't = {} e = {}'.format(index, energy_history[dataset][index])
             else:
                 name = '('+str(dataset+1)+chr(ord('`')+count+1)+') '+'t = {} e = {}'.format(index, energy_history[dataset][index])
             ax.set_xlabel(name, fontsize=8)
@@ -156,12 +157,17 @@ def visualize_multisnapshots(im_history, energy_history, snapshots_indices=[], a
         if count == len(snapshots_indices[dataset]):
             dataset += 1
             count = 0
-        ax.get_xaxis().set_ticks([])
-        ax.get_yaxis().set_ticks([])
+        ax.axes.xaxis.set_ticks([])
+        #ax.axes.xaxis.set_visible(False)
+        #ax.axes.yaxis.set_visible(False)
+        ax.axes.yaxis.set_ticks([])
+    rows = annotate_names
+    for ax, row in zip(axes[:,0], rows):
+        ax.set_ylabel(row+'         ', rotation=0, fontsize='small')
     fig.tight_layout()
     plt.show()
     if filename is not None:
-        fig.savefig(filename+'.pdf', dpi=400)
+        fig.savefig(filename+'.pdf', dpi=500)
         
     
 def plot_exptimetotarget(env, threshold_list, num_runs=1000, filename='exptime_diffthresholds.csv'):
